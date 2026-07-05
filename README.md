@@ -11,7 +11,7 @@ AI modelom (autofill forme), spremanje u PostgreSQL i slanje prijave u eVisitor 
 
 ## 1. Baza
 
-Kreiraj praznu bazu (naziv i kredencijali moraju odgovarati `application.properties`):
+Kreirati praznu bazu (naziv i kredencijali moraju odgovarati `application.properties`):
 
 ```sql
 CREATE DATABASE "evisitor-ai";
