@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spremi turiste</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main class="container-fluid px-3 px-md-4 py-4">
+
+    <h1 class="h3 mb-4">Spremi turiste (check-in)</h1>
+
+    <div class="alert alert-success" th:if="${message}" th:text="${message}">Poruka</div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <div class="row g-4">
+
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h2 class="h5">1. Skeniraj ispravu</h2>
+                    <div class="alert alert-success" th:if="${scanMessage}" th:text="${scanMessage}"></div>
+                    <div class="alert alert-danger" th:if="${scanError}" th:text="${scanError}"></div>
+
+                    <form th:action="@{/scan}" method="post" enctype="multipart/form-data" id="scanForm">
+                        <div class="input-group">
+                            <input type="file" class="form-control" name="image" accept="image/*" required>
+                            <button type="submit" class="btn btn-primary" id="scanButton">
+                                <span class="spinner-border spinner-border-sm me-1" id="scanSpinner" hidden></span>
+                                Skeniraj
+                            </button>
+                        </div>
+                    </form>
+                    <p class="text-muted small mt-2 mb-0">
+                        Odaberi sliku putovnice/osobne — Qwen će popuniti polja koja pročita.
+                    </p>
+
+                    <hr class="my-4">
+
+                    <h2 class="h5 mb-3">2. Podaci turista</h2>
+                    <form th:action="@{/add}" th:object="${touristForm}" method="post">
+                        <div class="row g-3">
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Vrsta isprave</label>
+                                <select class="form-select" th:field="*{documentType}" th:errorclass="is-invalid">
+                                    <option value="">Odaberi vrstu</option>
+                                    <option th:each="d : ${documentTypes}" th:value="${d}" th:text="${d.label}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:errors="*{documentType}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Broj isprave</label>
+                                <input type="text" class="form-control" th:field="*{documentNumber}"
+                                       th:errorclass="is-invalid" placeholder="npr. 963545637">
+                                <div class="invalid-feedback" th:errors="*{documentNumber}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Ime</label>
+                                <input type="text" class="form-control" th:field="*{touristName}"
+                                       th:errorclass="is-invalid" placeholder="npr. Ivan">
+                                <div class="invalid-feedback" th:errors="*{touristName}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Prezime</label>
+                                <input type="text" class="form-control" th:field="*{touristSurname}"
+                                       th:errorclass="is-invalid" placeholder="npr. Horvat">
+                                <div class="invalid-feedback" th:errors="*{touristSurname}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Spol</label>
+                                <select class="form-select" th:field="*{gender}" th:errorclass="is-invalid">
+                                    <option value="">Odaberi spol</option>
+                                    <option th:each="g : ${genders}" th:value="${g}" th:text="${g.label}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:errors="*{gender}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Datum rođenja</label>
+                                <input type="date" class="form-control" th:field="*{dateOfBirth}" th:errorclass="is-invalid">
+                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                            </div>
+
+                            <div class="col-6 col-sm-4">
+                                <label class="form-label">Država rođenja (ISO3)</label>
+                                <input type="text" class="form-control" maxlength="3" th:field="*{countryOfBirth}"
+                                       th:errorclass="is-invalid" placeholder="HRV">
+                                <div class="invalid-feedback" th:errors="*{countryOfBirth}"></div>
+                            </div>
+
+                            <div class="col-6 col-sm-4">
+                                <label class="form-label">Državljanstvo (ISO3)</label>
+                                <input type="text" class="form-control" maxlength="3" th:field="*{citizenship}"
+                                       th:errorclass="is-invalid" placeholder="HRV">
+                                <div class="invalid-feedback" th:errors="*{citizenship}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-4">
+                                <label class="form-label">Država prebivališta (ISO3)</label>
+                                <input type="text" class="form-control" maxlength="3" th:field="*{countryOfResidence}"
+                                       th:errorclass="is-invalid" placeholder="HRV">
+                                <div class="invalid-feedback" th:errors="*{countryOfResidence}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Grad prebivališta</label>
+                                <input type="text" class="form-control" th:field="*{cityOfResidence}"
+                                       th:errorclass="is-invalid" placeholder="npr. Zagreb">
+                                <div class="invalid-feedback" th:errors="*{cityOfResidence}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Objekt</label>
+                                <select class="form-select" th:field="*{facilityId}" th:errorclass="is-invalid">
+                                    <option value="">Odaberi objekt</option>
+                                    <option th:each="f : ${facilities}" th:value="${f.id}"
+                                            th:text="${f.name + ' (' + f.code + ')'}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:errors="*{facilityId}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Datum dolaska</label>
+                                <input type="date" class="form-control" th:field="*{stayFrom}" th:errorclass="is-invalid">
+                                <div class="invalid-feedback" th:errors="*{stayFrom}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Vrijeme dolaska</label>
+                                <input type="time" class="form-control" th:field="*{timeStayFrom}"
+                                       th:errorclass="is-invalid" required>
+                                <div class="invalid-feedback" th:errors="*{timeStayFrom}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Predviđeni datum odlaska</label>
+                                <input type="date" class="form-control" th:field="*{foreseenStayUntil}" th:errorclass="is-invalid">
+                                <div class="invalid-feedback" th:errors="*{foreseenStayUntil}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Predviđeno vrijeme odlaska</label>
+                                <input type="time" class="form-control" th:field="*{timeEstimatedStayUntil}"
+                                       th:errorclass="is-invalid" required>
+                                <div class="invalid-feedback" th:errors="*{timeEstimatedStayUntil}"></div>
+                            </div>
+
+                            <div class="col-12" th:if="${#fields.hasErrors('stayPeriodValid')}">
+                                <div class="text-danger small" th:errors="*{stayPeriodValid}"></div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="form-label">Kategorija naplate</label>
+                                <select class="form-select" th:field="*{ttPaymentCategory}" th:errorclass="is-invalid">
+                                    <option value="">Odaberi kategoriju</option>
+                                    <option th:each="c : ${paymentCategories}" th:value="${c}" th:text="${c.label}"></option>
+                                </select>
+                                <div class="invalid-feedback" th:errors="*{ttPaymentCategory}"></div>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-plus-lg me-1"></i>Spremi u check-in
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5">
+                        Turisti u ovom check-inu
+                        <span class="badge text-bg-secondary" th:text="${#lists.size(tourists)}">0</span>
+                    </h2>
+
+                    <p class="text-muted" th:if="${#lists.isEmpty(tourists)}">Još nema dodanih turista.</p>
+
+                    <ul class="list-group my-3" th:unless="${#lists.isEmpty(tourists)}">
+                        <li class="list-group-item d-flex align-items-center gap-2"
+                            th:each="t, stat : ${tourists}">
+                            <i class="bi fs-5 text-secondary"
+                               th:classappend="${t.gender != null and t.gender.name() == 'FEMALE'} ? 'bi-gender-female' : 'bi-gender-male'"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold" th:text="${t.touristName + ' ' + t.touristSurname}">Ime Prezime</div>
+                                <small class="text-muted" th:text="${t.nights} + ' noćenja'">0 noćenja</small>
+                            </div>
+                            <form th:action="@{/remove/{i}(i=${stat.index})}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Ukloni">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+
+                    <form th:action="@{/finish}" method="post">
+                        <button type="submit" class="btn btn-primary btn-lg w-100"
+                                th:disabled="${#lists.isEmpty(tourists)}">
+                            Završi check-in
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+
+<script>
+    const scanForm = document.getElementById('scanForm');
+    if (scanForm) {
+        scanForm.addEventListener('submit', function () {
+            const button = document.getElementById('scanButton');
+            document.getElementById('scanSpinner').hidden = false;
+            button.disabled = true;
+        });
+    }
+</script>
+
+</body>
+</html>

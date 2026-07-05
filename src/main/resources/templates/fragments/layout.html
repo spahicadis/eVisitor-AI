@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hr">
+<body>
+
+<nav th:fragment="header" class="site-header">
+    <a class="brand" th:href="@{/}">eVisitor-AI</a>
+    <div class="nav-links">
+        <a th:href="@{/}">Spremi turiste</a>
+        <a th:href="@{/tourists}">Moji turisti</a>
+        <a th:href="@{/facilities}">Moji objekti</a>
+    </div>
+</nav>
+
+<footer th:fragment="footer" class="site-footer">
+    © 2026 eVisitor-AI · Programiranje na Java virtualnom stroju (PJVS) — FIPU
+</footer>
+
+</body>
+</html>

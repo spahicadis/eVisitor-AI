@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moji turisti</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/layout :: header}"></div>
+
+<main class="container-fluid px-4 py-4">
+
+    <h1 class="h3 mb-4">Moji turisti</h1>
+
+    <div class="alert alert-success" th:if="${message}" th:text="${message}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h6 text-muted mb-1">Ukupno turista</h2>
+                    <p class="display-6 mb-0" th:text="${overview.total}">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h6 text-muted mb-1">Stalni turisti</h2>
+                    <p class="display-6 mb-0" th:text="${overview.returning}">0</p>
+                    <small class="text-muted">gosti s više od jednog boravka</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h6 text-muted mb-2">TOP 3 države (državljanstvo)</h2>
+                    <p class="text-muted mb-0" th:if="${#lists.isEmpty(overview.topCountries)}">—</p>
+                    <ul class="list-unstyled mb-0" th:unless="${#lists.isEmpty(overview.topCountries)}">
+                        <li class="d-flex justify-content-between border-bottom py-1"
+                            th:each="c : ${overview.topCountries}">
+                            <span th:text="${c.country}">HRV</span>
+                            <span class="badge text-bg-primary" th:text="${c.count}">0</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Ime i prezime</th>
+                    <th scope="col">Vrsta isprave</th>
+                    <th scope="col">Broj isprave</th>
+                    <th scope="col">Spol</th>
+                    <th scope="col">Datum rođenja</th>
+                    <th scope="col">Država rođenja</th>
+                    <th scope="col">Državljanstvo</th>
+                    <th scope="col">Država prebivališta</th>
+                    <th scope="col">Grad prebivališta</th>
+                    <th scope="col">Objekt</th>
+                    <th scope="col">Dolazak</th>
+                    <th scope="col">Odlazak</th>
+                    <th scope="col">Noćenja</th>
+                    <th scope="col">Kategorija naplate</th>
+                    <th scope="col">eVisitor</th>
+                    <th scope="col" class="text-end">Akcije</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(overview.tourists)}">
+                    <td colspan="17" class="text-center text-muted py-4">
+                        Još nema spremljenih turista.
+                    </td>
+                </tr>
+                <tr th:each="t, stat : ${overview.tourists}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${t.touristName + ' ' + t.touristSurname}">Ime Prezime</td>
+                    <td th:text="${t.documentType != null ? t.documentType.label : ''}">Putovnica</td>
+                    <td th:text="${t.documentNumber}">A1234567</td>
+                    <td th:text="${t.gender != null ? t.gender.label : ''}">Muški</td>
+                    <td th:text="${t.dateOfBirth != null ? #temporals.format(t.dateOfBirth, 'dd.MM.yyyy') : ''}">01.01.1990</td>
+                    <td th:text="${t.countryOfBirth}">HRV</td>
+                    <td th:text="${t.citizenship}">HRV</td>
+                    <td th:text="${t.countryOfResidence}">HRV</td>
+                    <td th:text="${t.cityOfResidence}">Pula</td>
+                    <td th:text="${t.facility != null ? t.facility.name : ''}">Objekt</td>
+                    <td>
+                        <span th:if="${t.stayFrom != null}"
+                              th:text="${#temporals.format(t.stayFrom, 'dd.MM.yyyy')}">01.07.2026</span>
+                        <span class="text-muted" th:if="${t.timeStayFrom != null}"
+                              th:text="${#temporals.format(t.timeStayFrom, 'HH:mm')}">16:00</span>
+                    </td>
+                    <td>
+                        <span th:if="${t.foreseenStayUntil != null}"
+                              th:text="${#temporals.format(t.foreseenStayUntil, 'dd.MM.yyyy')}">05.07.2026</span>
+                        <span class="text-muted" th:if="${t.timeEstimatedStayUntil != null}"
+                              th:text="${#temporals.format(t.timeEstimatedStayUntil, 'HH:mm')}">10:00</span>
+                    </td>
+                    <td th:text="${t.nights}">4</td>
+                    <td th:text="${t.ttPaymentCategory != null ? t.ttPaymentCategory.label : ''}">N</td>
+                    <td>
+                        <span class="badge text-bg-success" th:if="${t.evisitorStatus.name() == 'SENT'}"
+                              th:text="${t.evisitorStatus.label}">Poslano</span>
+                        <span class="badge text-bg-danger" th:if="${t.evisitorStatus.name() == 'FAILED'}"
+                              th:title="${t.evisitorError}" th:text="${t.evisitorStatus.label}">Greška</span>
+                        <span class="badge text-bg-secondary" th:if="${t.evisitorStatus.name() == 'NOT_SENT'}"
+                              th:text="${t.evisitorStatus.label}">Nije poslano</span>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <form class="d-inline" method="post"
+                              th:action="@{/tourists/{id}/send(id=${t.id})}">
+                            <button type="submit" class="btn btn-sm btn-outline-success"
+                                    th:disabled="${t.evisitorStatus.name() == 'SENT'}"
+                                    th:title="${t.evisitorStatus.name() == 'SENT'} ? 'Već poslano' : 'Pošalji u eVisitor'">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" title="Uredi"
+                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                th:data-id="${t.id}"
+                                th:data-document-type="${t.documentType != null ? t.documentType.name() : ''}"
+                                th:data-document-number="${t.documentNumber}"
+                                th:data-tourist-name="${t.touristName}"
+                                th:data-tourist-surname="${t.touristSurname}"
+                                th:data-gender="${t.gender != null ? t.gender.name() : ''}"
+                                th:data-date-of-birth="${t.dateOfBirth != null ? #temporals.format(t.dateOfBirth, 'yyyy-MM-dd') : ''}"
+                                th:data-country-of-birth="${t.countryOfBirth}"
+                                th:data-citizenship="${t.citizenship}"
+                                th:data-country-of-residence="${t.countryOfResidence}"
+                                th:data-city-of-residence="${t.cityOfResidence}"
+                                th:data-facility-id="${t.facility != null ? t.facility.id : ''}"
+                                th:data-stay-from="${t.stayFrom != null ? #temporals.format(t.stayFrom, 'yyyy-MM-dd') : ''}"
+                                th:data-time-stay-from="${t.timeStayFrom != null ? #temporals.format(t.timeStayFrom, 'HH:mm') : ''}"
+                                th:data-foreseen-stay-until="${t.foreseenStayUntil != null ? #temporals.format(t.foreseenStayUntil, 'yyyy-MM-dd') : ''}"
+                                th:data-time-estimated-stay-until="${t.timeEstimatedStayUntil != null ? #temporals.format(t.timeEstimatedStayUntil, 'HH:mm') : ''}"
+                                th:data-tt-payment-category="${t.ttPaymentCategory != null ? t.ttPaymentCategory.name() : ''}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="Obriši"
+                                data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                th:data-id="${t.id}"
+                                th:data-name="${t.touristName + ' ' + t.touristSurname}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <form id="editForm" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Uredi turista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zatvori"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Vrsta isprave</label>
+                            <select class="form-select" id="edit-documentType" name="documentType" required>
+                                <option value="">-- odaberi --</option>
+                                <option th:each="d : ${documentTypes}" th:value="${d}" th:text="${d.label}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Broj isprave</label>
+                            <input type="text" class="form-control" id="edit-documentNumber" name="documentNumber" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ime</label>
+                            <input type="text" class="form-control" id="edit-touristName" name="touristName" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Prezime</label>
+                            <input type="text" class="form-control" id="edit-touristSurname" name="touristSurname" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Spol</label>
+                            <select class="form-select" id="edit-gender" name="gender" required>
+                                <option value="">-- odaberi --</option>
+                                <option th:each="g : ${genders}" th:value="${g}" th:text="${g.label}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Datum rođenja</label>
+                            <input type="date" class="form-control" id="edit-dateOfBirth" name="dateOfBirth" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Država rođenja (ISO3)</label>
+                            <input type="text" class="form-control" id="edit-countryOfBirth" name="countryOfBirth"
+                                   maxlength="3" minlength="3" placeholder="HRV" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Državljanstvo (ISO3)</label>
+                            <input type="text" class="form-control" id="edit-citizenship" name="citizenship"
+                                   maxlength="3" minlength="3" placeholder="HRV" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Država prebivališta (ISO3)</label>
+                            <input type="text" class="form-control" id="edit-countryOfResidence" name="countryOfResidence"
+                                   maxlength="3" minlength="3" placeholder="HRV" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Grad prebivališta</label>
+                            <input type="text" class="form-control" id="edit-cityOfResidence" name="cityOfResidence" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Objekt</label>
+                            <select class="form-select" id="edit-facilityId" name="facilityId" required>
+                                <option value="">-- odaberi objekt --</option>
+                                <option th:each="f : ${facilities}" th:value="${f.id}"
+                                        th:text="${f.name + ' (' + f.code + ')'}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Datum dolaska</label>
+                            <input type="date" class="form-control" id="edit-stayFrom" name="stayFrom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Vrijeme dolaska</label>
+                            <input type="time" class="form-control" id="edit-timeStayFrom" name="timeStayFrom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Predviđeni datum odlaska</label>
+                            <input type="date" class="form-control" id="edit-foreseenStayUntil" name="foreseenStayUntil" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Predviđeno vrijeme odlaska</label>
+                            <input type="time" class="form-control" id="edit-timeEstimatedStayUntil" name="timeEstimatedStayUntil" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kategorija naplate</label>
+                            <select class="form-select" id="edit-ttPaymentCategory" name="ttPaymentCategory" required>
+                                <option value="">-- odaberi --</option>
+                                <option th:each="c : ${paymentCategories}" th:value="${c}" th:text="${c.label}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Odustani</button>
+                    <button type="submit" class="btn btn-primary">Spremi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Brisanje turista</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zatvori"></button>
+            </div>
+            <div class="modal-body">
+                Jeste li sigurni da želite obrisati turista
+                <strong id="deleteTouristName"></strong>? Ova radnja je nepovratna.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Odustani</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Obriši</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const trigger = event.relatedTarget;
+            document.getElementById('deleteTouristName').textContent = trigger.getAttribute('data-name');
+            document.getElementById('deleteForm').action = '/tourists/' + trigger.getAttribute('data-id') + '/delete';
+        });
+    }
+
+    const editModal = document.getElementById('editModal');
+    if (editModal) {
+        const editFields = ['documentType', 'documentNumber', 'touristName', 'touristSurname',
+            'gender', 'dateOfBirth', 'countryOfBirth', 'citizenship', 'countryOfResidence',
+            'cityOfResidence', 'facilityId', 'stayFrom', 'timeStayFrom', 'foreseenStayUntil',
+            'timeEstimatedStayUntil', 'ttPaymentCategory'];
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const data = event.relatedTarget.dataset;
+            document.getElementById('editForm').action = '/tourists/' + data.id + '/edit';
+            editFields.forEach(function (field) {
+                const input = document.getElementById('edit-' + field);
+                if (input) {
+                    input.value = data[field] != null ? data[field] : '';
+                }
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
